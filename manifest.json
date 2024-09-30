@@ -1,12 +1,18 @@
 {
-  "name": "it is spelled Roblox",
-  "description": "fixes Roblox misspellings",
-  "version": "1.0.3",
+  "name": "It's Spelt 'Rōblox'",
+  "description": "'Fixes' 'Rōblox' misspellings.",
+  "version": "1.0.4",
   "manifest_version": 3,
-  "content_scripts": [{
-    "js": ["content.js"],
-    "matches": ["https://*/*"]
-  }],
+  "content_scripts": [
+    {
+      "js": [
+        "content.js"
+      ],
+      "matches": [
+        "https://*/*"
+      ]
+    }
+  ],
   "permissions": [
     "tabs"
   ]
