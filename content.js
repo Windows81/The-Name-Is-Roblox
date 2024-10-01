@@ -71,7 +71,7 @@ function fixRobloxText(text) {
 
 // Collects a list of non-empty text nodes descended from `el`.
 function deepNonEmptyTextNodes(el) {
-	return [...el.childNodes].flatMap((e) =>
+	return Array.from(el.childNodes).flatMap((e) =>
 		e.nodeType === Node.TEXT_NODE && e.textContent.trim() ? e : deepNonEmptyTextNodes(e)
 	);
 }
@@ -81,13 +81,13 @@ function traverseTags() {
 	console.log("Changing all tags...");
 
 	// Iterates over all text on a page to fix misspellings.
-	const textTags = [...document.querySelectorAll(textTagNames)];
+	const textTags = Array.from(document.querySelectorAll(textTagNames));
 	textTags.forEach((tagNode) => {
 		const textNodes = deepNonEmptyTextNodes(tagNode);
-		textNodes.forEach((node) => {
+		for (let node of textNodes) {
 			const newText = fixRobloxText(node.nodeValue);
 			if (node.nodeValue != newText) node.nodeValue = newText;
-		});
+		}
 	});
 }
 
