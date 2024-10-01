@@ -25,7 +25,7 @@ const textTagNames = [
 	"li",
 	"td",
 	"caption",
-	"span",
+	":not([id^='LC'])>span", // Protects GitHub code pages.
 	"h1",
 	"h2",
 	"h3",
@@ -46,7 +46,7 @@ const textTagNames = [
 	"q",
 	"code",
 	"ins",
-	"pre",
+	":not(body)>pre", // Avoids changing raw files.
 	"div",
 	"ul",
 	"ol",
@@ -71,9 +71,10 @@ function fixRobloxText(text) {
 
 // Collects a list of non-empty text nodes descended from `el`.
 function deepNonEmptyTextNodes(el) {
-	return Array.from(el.childNodes).flatMap((e) =>
-		e.nodeType === Node.TEXT_NODE && e.textContent.trim() ? e : deepNonEmptyTextNodes(e)
-	);
+	return Array.from(el.childNodes).flatMap((e) => {
+		if (e.nodeType === Node.TEXT_NODE) return e;
+		return [];
+	});
 }
 
 // Traverses the page to find all text tags.
