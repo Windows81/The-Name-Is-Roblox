@@ -17,7 +17,7 @@
 const correctionMap = {
 	Roblox: "Rōblox",
 	roblox: "rōblox",
-	ROBLOX: "Rōblox",
+	ROBLOX: "RŌBLOX",
 };
 
 const textTagNames = [
@@ -25,7 +25,7 @@ const textTagNames = [
 	"li",
 	"td",
 	"caption",
-	":not([id^='LC'])>span", // Protects GitHub code pages.
+	"span",
 	"h1",
 	"h2",
 	"h3",
@@ -46,7 +46,7 @@ const textTagNames = [
 	"q",
 	"code",
 	"ins",
-	":not(body)>pre", // Avoids changing raw files.
+	"pre",
 	"div",
 	"ul",
 	"ol",
@@ -61,12 +61,36 @@ const textTagNames = [
 	"b",
 ];
 
+const textBlocklist = [
+	"body>pre", // Avoids changing raw files.
+	"[id^='LC']>span", // Protects GitHub code pages.
+	"[class^='codeLine'] span", // Protects Discord code snippets.
+	"code span", // Protects Discord code snippets.
+	"[role='textbox'] *", // Protects entry textboxes.
+];
+
 // Fixes the text given by replacing incorrect spellings of 'Roblox'.
 function fixRobloxText(text) {
 	Object.entries(correctionMap).forEach(
 		([incorrectSpelling, correctSpelling]) => (text = text.replaceAll(incorrectSpelling, correctSpelling))
 	);
 	return text;
+}
+
+// https://stackoverflow.com/a/1723580
+function* setMinus(A, B) {
+	const setA = new Set(A);
+	const setB = new Set(B);
+
+	for (const v of setB.values()) {
+		if (!setA.delete(v)) {
+			yield v;
+		}
+	}
+
+	for (const v of setA.values()) {
+		yield v;
+	}
 }
 
 // Collects a list of non-empty text nodes descended from `el`.
@@ -79,17 +103,14 @@ function deepNonEmptyTextNodes(el) {
 
 // Traverses the page to find all text tags.
 function traverseTags() {
-	console.log("Changing all tags...");
-
 	// Iterates over all text on a page to fix misspellings.
-	const textTags = Array.from(document.querySelectorAll(textTagNames));
-	textTags.forEach((tagNode) => {
+	for (let tagNode of setMinus(document.querySelectorAll(textTagNames), document.querySelectorAll(textBlocklist))) {
 		const textNodes = deepNonEmptyTextNodes(tagNode);
 		for (let node of textNodes) {
 			const newText = fixRobloxText(node.nodeValue);
 			if (node.nodeValue != newText) node.nodeValue = newText;
 		}
-	});
+	}
 }
 
 setInterval(traverseTags, 1000);
